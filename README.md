@@ -21,4 +21,4 @@ chmod +x auto-knight-color
 You can customize the light and dark colors used by the script by modifying the light_scheme and dark_scheme variables at the top of the script.
 
 ## Credit
-This project is based on auto-knight by Dmitriy Safiullin (DimseBoms). Changes have been made to modify only the KDE color scheme.
+This project is based on auto-knight by Dmitriy Safiullin (DimseBoms). Changes have been made to modify only the KDE color scheme. https://github.com/DimseBoms/auto-knight
