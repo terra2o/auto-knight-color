@@ -1,0 +1,60 @@
+#!/bin/bash
+
+# Name: auto-knight-color
+# Description: This script automatically changes the color scheme of
+# KDE Plasma based on the time of day. It utilizes KDE's built-in
+# Night Light feature to determine whether it is day or night.
+# The script is intended to be autostarted (using the KDE app "Autostart").
+# Author: Dmitriy Safiullin
+# Modified by: terra2o (14.09.2025) – Changes color scheme
+# instead of full theme (so it doesn’t affect icons, cursors, or window decorations)
+# If you're using kde-material-you-colors, change:
+# "BreezeDark" -> "MaterialYouDark"
+# "BreezeLight" -> "MaterialYouLight"
+# If something goes wrong, try using "qdbus" instead of "qdbus-qt6" at line 30
+
+# Scheme and command settings
+LIGHT_SCHEME="BreezeLight"
+DARK_SCHEME="BreezeDark"
+CHANGE_COLOR_COMMAND="plasma-apply-colorscheme"
+
+# Sets scheme and updates state
+set_scheme() {
+    $CHANGE_COLOR_COMMAND "$1"
+    LAST_SCHEME="$1"
+}
+
+# Retrieves current daylight status
+is_daylight() {
+    local daylight_status
+    daylight_status=$(qdbus-qt6 org.kde.KWin /org/kde/KWin/NightLight \
+        org.kde.KWin.NightLight.daylight)
+    [[ "$daylight_status" == "true" ]]
+}
+
+# Initializes the scheme based on the current daylight status
+initialize_scheme() {
+    if is_daylight; then
+        set_scheme "$LIGHT_SCHEME"
+    else
+        set_scheme "$DARK_SCHEME"
+    fi
+}
+
+# Monitors changes in daylight status and updates the scheme accordingly
+monitor_daylight_changes() {
+    dbus-monitor --session \
+        "type='signal',interface='org.freedesktop.DBus.Properties', \
+        member='PropertiesChanged', path='/org/kde/KWin/NightLight'" |
+        grep --line-buffered "daylight" |
+        while read -r line; do
+            if is_daylight; then
+                [[ "$LAST_SCHEME" != "$LIGHT_SCHEME" ]] && set_scheme "$LIGHT_SCHEME"
+            else
+                [[ "$LAST_SCHEME" != "$DARK_SCHEME" ]] && set_scheme "$DARK_SCHEME"
+            fi
+        done
+}
+
+initialize_scheme
+monitor_daylight_changes
