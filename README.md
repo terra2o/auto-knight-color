@@ -12,9 +12,9 @@ It is intended to be light weight.
 To use auto-knight-color, you need to have the above dependencies installed. You can then download the script, make it executable and add it as a login script via KDE autostart.
 
 After opening a terminal in the same directory as the script, make it executable with this command:
-'''
+```
 chmod +x auto-knight-color
-'''
+```
 
 
 ## Customization
